@@ -1,4 +1,4 @@
-GNN-Based Switching Activity Prediction for Power Estimation
+# GNN-Based Switching Activity Prediction for Power Estimation
 
 A Graph Neural Network (GNN)-based research project exploring the prediction of switching activity in digital circuits using circuit netlist representations.
 
@@ -6,7 +6,7 @@ The project investigates how graph-based learning can capture structural relatio
 
 ---
 
-Project Overview
+## Project Overview
 
 Dynamic power consumption in digital circuits is strongly influenced by switching activity. Accurate estimation of signal transitions is therefore an important part of power analysis and optimization.
 
@@ -16,204 +16,224 @@ This project explores the use of Graph Neural Networks (GNNs) to learn circuit-l
 
 The circuit is represented as a directed graph:
 
-- Nodes: Represent circuit cells.
-- Edges: Represent connectivity between cells.
-- Node features: Capture switching probabilities and other cell-related information.
-- Edge features: Capture signal-transition and connectivity information.
+- **Nodes:** Represent circuit cells.
+- **Edges:** Represent connectivity between cells.
+- **Node features:** Capture switching probabilities and other cell-related information.
+- **Edge features:** Capture signal-transition and connectivity information.
 
 The GNN learns from these graph representations to estimate switching-related outputs.
 
-Research Workflow
+---
+
+## Research Workflow
 
 The broader research investigates two prediction stages:
 
-1. RTL-to-Synthesis: Predicting switching activity at the synthesis stage using RTL-derived information.
-2. Synthesis-to-Route: Investigating switching activity estimation between synthesis and routed implementation stages.
+1. **RTL-to-Synthesis:** Predicting switching activity at the synthesis stage using RTL-derived information.
+2. **Synthesis-to-Route:** Investigating switching activity estimation between synthesis and routed implementation stages.
 
-The overall workflow can be represented as:
+The overall workflow:
 
-       RTL Design
-           |
-           v
-   RTL Activity Information
-           |
-           v
+```text
+        RTL Design
+            |
+            v
+  RTL Activity Information
+            |
+            v
    GNN-Based Prediction
-           |
-           v
-   Synthesis Activity
-           |
-           v
-  Synthesis-to-Route
-  Activity Estimation
-           |
-           v
-    Routed Activity
-           |
-           v
+            |
+            v
+    Synthesis Activity
+            |
+            v
+     Synthesis-to-Route
+    Activity Estimation
+            |
+            v
+     Routed Activity
+            |
+            v
       Power Analysis
+```
 
-Repository scope: This public repository exposes the RTL-to-synthesis model implementation. The separate synthesis-to-route research model is not included because its associated research is unpublished. Its implementation and methodology are intentionally withheld.
-
-The reported experimental results below belong to the broader prediction workflow and should not be interpreted as results reproducible from the public model file alone.
+> **Repository scope:** This public repository exposes the RTL-to-synthesis model implementation. The separate synthesis-to-route research model is not included because its associated research is unpublished. Its implementation and methodology are intentionally withheld.
+>
+> The reported experimental results below belong to the broader prediction workflow and should not be interpreted as results reproducible from the public model file alone.
 
 ---
 
-Public Model Architecture
+## Public Model Architecture
 
-The publicly available implementation defines an Edge-Aware GraphSAGE architecture.
+The publicly available implementation defines an **Edge-Aware GraphSAGE** architecture.
 
 Unlike conventional graph models that use only node information, this architecture incorporates both node and edge features during message passing.
 
-1. Graph Representation
+### 1. Graph Representation
 
-Component| Description| Dimension
-Node features| Switching probabilities and cell-related features| 5
-Edge features| Connectivity and transition-related features| 17
-Hidden representation| Learned graph embedding| 64
-Message-passing layers| Edge-aware GraphSAGE layers| 2
-Output heads| Independent switching-related predictions| 4
+| Component | Description | Dimension |
+|---|---|---|
+| Node features | Switching probabilities and cell-related features | 5 |
+| Edge features | Connectivity and transition-related features | 17 |
+| Hidden representation | Learned graph embedding | 64 |
+| Message-passing layers | Edge-aware GraphSAGE layers | 2 |
+| Output heads | Independent switching-related predictions | 4 |
 
-2. Node Features
+### 2. Node Features
 
 Each node is represented using five features:
 
+```text
 [p0, p1, pt1, pt0, inv]
+```
 
 These features provide information about signal probabilities and cell-related characteristics.
 
-3. Edge Features
+### 3. Edge Features
 
 Each directed edge is represented using 17 features:
 
+```text
 [SC, TC_00_00, ..., TC_11_11]
+```
 
 These features provide additional information about connectivity and transition relationships between circuit elements.
 
-4. Architecture Details
+### 4. Architecture Details
 
 The model consists of the following stages:
 
-1. Feature Attention: Learns the relative importance of node and edge features.
-2. Node and Edge Encoders: Transform the input features into a common hidden representation.
-3. Edge-Aware GraphSAGE Layers: Perform message passing using both node and edge information.
-4. Attention-Based Aggregation: Aggregates incoming messages at destination nodes.
-5. Residual Node Updates: Preserves and updates node representations across graph layers.
-6. Prediction Heads: Produces four independent switching-related outputs.
+1. **Feature Attention:** Learns the relative importance of node and edge features.
+2. **Node and Edge Encoders:** Transform the input features into a common hidden representation.
+3. **Edge-Aware GraphSAGE Layers:** Perform message passing using both node and edge information.
+4. **Attention-Based Aggregation:** Aggregates incoming messages at destination nodes.
+5. **Residual Node Updates:** Preserves and updates node representations across graph layers.
+6. **Prediction Heads:** Produce four independent switching-related outputs.
 
-5. Prediction Outputs
+### 5. Prediction Outputs
 
 The model uses four independent sigmoid output heads:
 
+```text
 [p0, p1, psw01, psw10]
+```
 
 These represent the predicted output quantities associated with logic-state probabilities and switching transitions.
 
 The outputs are independently estimated rather than normalized using a softmax operation.
 
-Primary architectural configuration:
+### Primary Architectural Configuration
 
-Parameter| Value
-Node feature dimension| 5
-Edge feature dimension| 17
-Hidden dimension| 64
-GraphSAGE layers| 2
-Dropout| 0.1
-Prediction heads| 4
+| Parameter | Value |
+|---|---|
+| Node feature dimension | 5 |
+| Edge feature dimension | 17 |
+| Hidden dimension | 64 |
+| GraphSAGE layers | 2 |
+| Dropout | 0.1 |
+| Prediction heads | 4 |
 
 ---
 
-Experimental Results
+## Experimental Results
 
 The following results summarize the reported evaluation across benchmark circuits.
 
 Two error metrics are presented:
 
-- Switch Error: Reported switching-activity prediction error.
-- Total Error: Reported total prediction error.
+- **Switch Error:** Reported switching-activity prediction error.
+- **Total Error:** Reported total prediction error.
 
-Switching Error by Circuit
+### Switching Error by Circuit
 
-"Switching Error" (assets/switching_error.png)
+```mermaid
+xychart-beta
+    title "Switching Error by Circuit (%)"
+    x-axis [Priority, adder, arbiter, c1355, c17, c1908, c2670, c3540, c432, c499, c5315, c6288, c7552, c880, cavlc, dec, int2float, voter]
+    y-axis "Switch Error (%)" 0 --> 30
+    bar [1.28, 29.28, 18.14, 8.53, 14.03, 2.46, 12.82, 7.69, 1.79, 17.72, 7.37, 13.79, 8.83, 10.00, 7.94, 1.74, 9.46, 6.93]
+```
 
-Total Error by Circuit
+### Total Error by Circuit
 
-"Total Error" (assets/total_error.png)
+```mermaid
+xychart-beta
+    title "Total Error by Circuit (%)"
+    x-axis [Priority, adder, arbiter, c1355, c17, c1908, c2670, c3540, c432, c499, c5315, c6288, c7552, c880, cavlc, dec, int2float, voter]
+    y-axis "Total Error (%)" 0 --> 20
+    bar [1.80, 17.51, 17.76, 5.00, 2.93, 2.58, 11.84, 7.65, 0.78, 15.48, 5.33, 3.96, 7.41, 10.57, 9.05, 0.00, 9.28, 6.68]
+```
 
-Detailed Results
+### Detailed Results
 
-Circuit| Switch Error (%)| Total Error (%)
-Priority| 1.2800| 1.7964
-adder| 29.2806| 17.5090
-arbiter| 18.1440| 17.7632
-c1355| 8.5308| 5.0000
-c17| 14.0299| 2.9289
-c1908| 2.4609| 2.5806
-c2670| 12.8169| 11.8421
-c3540| 7.6923| 7.6503
-c432| 1.7921| 0.7800
-c499| 17.7215| 15.4839
-c5315| 7.3733| 5.3292
-c6288| 13.7856| 3.9604
-c7552| 8.8328| 7.4118
-c880| 10.0000| 10.5691
-cavlc| 7.9365| 9.0535
-dec| 1.7391| 0.0000
-int2float| 9.4595| 9.2848
-voter| 6.9264| 6.6778
+| Circuit | Switch Error (%) | Total Error (%) |
+|---|---|---|
+| Priority | 1.2800 | 1.7964 |
+| adder | 29.2806 | 17.5090 |
+| arbiter | 18.1440 | 17.7632 |
+| c1355 | 8.5308 | 5.0000 |
+| c17 | 14.0299 | 2.9289 |
+| c1908 | 2.4609 | 2.5806 |
+| c2670 | 12.8169 | 11.8421 |
+| c3540 | 7.6923 | 7.6503 |
+| c432 | 1.7921 | 0.7800 |
+| c499 | 17.7215 | 15.4839 |
+| c5315 | 7.3733 | 5.3292 |
+| c6288 | 13.7856 | 3.9604 |
+| c7552 | 8.8328 | 7.4118 |
+| c880 | 10.0000 | 10.5691 |
+| cavlc | 7.9365 | 9.0535 |
+| dec | 1.7391 | 0.0000 |
+| int2float | 9.4595 | 9.2848 |
+| voter | 6.9264 | 6.6778 |
 
-Overall Reported Performance
+### Overall Reported Performance
 
-Metric| Result
-Average Switch Error| 9.9890%
-Average Total Error| 7.5345%
-Circuits Evaluated| 18
-Circuits Skipped| 12
+| Metric | Result |
+|---|---|
+| Average Switch Error | 9.9890% |
+| Average Total Error | 7.5345% |
+| Circuits Evaluated | 18 |
+| Circuits Skipped | 12 |
 
-Twelve benchmark entries were skipped because their corresponding result files were missing during evaluation.
-
-The reported averages are retained from the original evaluation output.
+Twelve benchmark entries were skipped because their corresponding result files were missing during evaluation. The reported averages are retained from the original evaluation output.
 
 ---
 
-Repository Structure
+## Repository Structure
 
+```text
 GNN_for_PowerEstimation/
 │
 ├── README.md
-│
-├── model.py
-│
-└── assets/
-    ├── switching_error.png
-    └── total_error.png
+└── model.py
+```
 
-Public Files
+### Public Files
 
-File| Description
-"model.py"| Public Edge-Aware GraphSAGE model definition
-"README.md"| Project overview, architecture and experimental results
-"assets/"| Experimental result visualizations
+| File | Description |
+|---|---|
+| `model.py` | Public Edge-Aware GraphSAGE model definition |
+| `README.md` | Project overview, architecture and experimental results |
 
-Implementation note: The current public repository does not contain the complete training and evaluation pipeline. The model also imports attention and GraphSAGE components from "utilis.attention", which is not included in the public repository. Therefore, this repository is intended primarily to document the research and expose the public model architecture, rather than provide a standalone reproducible implementation.
+> **Implementation note:** The current public repository does not contain the complete training and evaluation pipeline. The model also imports attention and GraphSAGE components from `utilis.attention`, which is not included in the public repository. Therefore, this repository is intended primarily to document the research and expose the public model architecture, rather than provide a standalone reproducible implementation.
 
 ---
 
-Research Context
+## Research Context
 
 This work is inspired by research on graph-based approaches for power estimation and switching-activity prediction.
 
-Related research:
+**Related research:**
 
-GRIPT — Graph-based research related to power estimation.
-
-"Read the research paper (IEEE DOI)" (https://doi.org/10.1109/TCAD.2025.3563420)
+**GRIPT** — Graph-based research related to power estimation.
+[Read the research paper (IEEE DOI)](https://doi.org/10.1109/TCAD.2025.3563420)
 
 This project is an independent implementation and research exploration. It does not claim to reproduce the GRIPT methodology or its reported results.
 
 ---
 
-Key Areas of Work
+## Key Areas of Work
 
 - Circuit netlist representation using directed graphs.
 - Feature engineering for cell and connectivity information.
@@ -225,9 +245,7 @@ Key Areas of Work
 
 ---
 
-Future Research Directions
-
-Potential directions for further investigation include:
+## Future Research Directions
 
 - Improving prediction accuracy across different circuit architectures.
 - Evaluating generalization to unseen circuit designs.
@@ -237,8 +255,8 @@ Potential directions for further investigation include:
 
 ---
 
-Acknowledgment
+## Acknowledgment
 
 This project was developed as part of research into machine-learning-assisted power estimation for digital integrated circuits.
 
-Research focus: Graph Neural Networks · VLSI Design · Switching Activity Prediction · RTL · Synthesis · Physical Design · Power Estimation
+**Research focus:** Graph Neural Networks · VLSI Design · Switching Activity Prediction · RTL · Synthesis · Physical Design · Power Estimation
