@@ -144,25 +144,6 @@ Two error metrics are presented:
 - **Switch Error:** Reported switching-activity prediction error.
 - **Total Error:** Reported total prediction error.
 
-### Switching Error by Circuit
-
-```mermaid
-xychart-beta
-    title "Switching Error by Circuit (%)"
-    x-axis [Priority, adder, arbiter, c1355, c17, c1908, c2670, c3540, c432, c499, c5315, c6288, c7552, c880, cavlc, dec, int2float, voter]
-    y-axis "Switch Error (%)" 0 --> 30
-    bar [1.28, 29.28, 18.14, 8.53, 14.03, 2.46, 12.82, 7.69, 1.79, 17.72, 7.37, 13.79, 8.83, 10.00, 7.94, 1.74, 9.46, 6.93]
-```
-
-### Total Error by Circuit
-
-```mermaid
-xychart-beta
-    title "Total Error by Circuit (%)"
-    x-axis [Priority, adder, arbiter, c1355, c17, c1908, c2670, c3540, c432, c499, c5315, c6288, c7552, c880, cavlc, dec, int2float, voter]
-    y-axis "Total Error (%)" 0 --> 20
-    bar [1.80, 17.51, 17.76, 5.00, 2.93, 2.58, 11.84, 7.65, 0.78, 15.48, 5.33, 3.96, 7.41, 10.57, 9.05, 0.00, 9.28, 6.68]
-```
 
 ### Detailed Results
 
@@ -196,7 +177,6 @@ xychart-beta
 | Circuits Evaluated | 18 |
 | Circuits Skipped | 12 |
 
-Twelve benchmark entries were skipped because their corresponding result files were missing during evaluation. The reported averages are retained from the original evaluation output.
 
 ---
 
